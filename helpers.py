@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
 import numpy as np
 import re
 import json
@@ -111,7 +113,7 @@ class ShawsLSTM(nn.Module):
         # return one batch of output word scores and the hidden state
         return output, state
 
-    def init_hidden(self, batch_size, device):
+    def init_hidden(self, batch_size, device='cpu'):
         '''
         Initialize the hidden state of an LSTM in the shape (n_layers, batch_size, hidden_dim)
         inputs:
@@ -304,7 +306,7 @@ def save_model_state(outpath: str, epoch: int, model: nn.Module, optimizer: torc
     pass
 
 
-def load_model_state(model, optimizer, inpath):
+def load_model_state(model, inpath, optimizer=False):
     '''
     load PyTorch model and optimizer to continue training
     inputs:
@@ -314,10 +316,15 @@ def load_model_state(model, optimizer, inpath):
     note: input model & optimizer should already be instanciated. this routine only updates their states.
     '''
 
-    start_epoch = 0
+    # load checkpoint
     checkpoint = torch.load(inpath)
-    start_epoch = checkpoint['epoch']
     model.load_state_dict(checkpoint['state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
 
-    return model, optimizer, start_epoch
+    if optimizer:
+
+        start_epoch = checkpoint['epoch']
+        optimizer.load_state_dict(checkpoint['optimizer'])
+
+        return model, optimizer, start_epoch
+
+    return model
