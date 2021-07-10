@@ -120,7 +120,7 @@ if __name__ == "__main__":
 
     primer = str(sys.argv[1])  # first argument is the file name
     dialog_length = int(sys.argv[2])  # first argument is the file name
-    text = generate(primer, dialog_length, 'cpu')
+    text = generate(primer, dialog_length)
 
     # print result
     print(text)
